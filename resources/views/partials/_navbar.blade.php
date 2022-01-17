@@ -4,8 +4,8 @@
             <li class="nav-item">
                 <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown" href="#"
                     aria-expanded="false">
-                    <span class="user-profile"><img src="{{ asset('images/defaults/logomarks.png')}}" class="img-circle"
-                            alt="user avatar"></span>
+                    <!-- <span class="user-profile"><img src="{{ asset('images/defaults/logomarks.png')}}" class="img-circle"
+                            alt="user avatar"></span> -->
                 </a>
                 <ul class="dropdown-menu">
                     <li class="dropdown-item user-details">

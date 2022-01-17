@@ -3,7 +3,7 @@
         <div class="simplebar-content">
             <div class="brand-logo">
                 <a href="{{ route('home') }}">
-                    <img src="{{ asset('images/defaults/logo.png') }}" class="logo-icon mt-4" alt="logo icon">
+                    <!-- <img src="{{ asset('images/defaults/logo.png') }}" class="logo-icon mt-4" alt="logo icon"> -->
                 </a>
             </div>
             <ul class="sidebar-menu">
