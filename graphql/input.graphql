@@ -1,0 +1,151 @@
+input AddExpoTokenInput {
+    token: String! @rules(apply: ["required", "string"])
+}
+
+input InquiryInput {
+    name: String! @rules(apply: ["required"])
+    email: String! @rules(apply: ["required", "email"])
+    message: String! @rules(apply: ["required"])
+    user_id: String @rules(apply: ["numeric", "exists:users,id"])
+}
+
+input LoginViaPhoneInput {
+    phone: String! @rules(apply: ["required", "min:10"])
+    password: String! @rules(apply: ["required", "min:6"])
+    role_id: String! @rules(apply: ["numeric", "exists:roles,id"])
+}
+
+input LoginViaPhoneOnlyInput {
+    phone: String! @rules(apply: ["required", "min:10"])
+    role_id: String! @rules(apply: ["numeric", "exists:roles,id"])
+}
+
+input ForgotViaPhoneInput {
+    phone: String! @rules(apply: ["required", "numeric", "digits:10"])
+    role_id: String! @rules(apply: ["numeric", "exists:roles,id"])
+    otp_hash: String
+}
+
+input ForgotViaEmailInput {
+    email: String! @rules(apply: ["required", "email"])
+}
+input ChangePasswordInput {
+    password: String! @rules(apply: ["required", "confirmed", "min:6"])
+    password_confirmation: String!
+}
+input BranchFilterServiceInput {
+    name: String @rules(apply: ["string"])
+    subcategory_id: String @rules(apply: ["numeric", "exists:subcategories,id"])
+    category_id: String @rules(apply: ["numeric", "exists:categories,id"])
+    latitude: String @rules(apply: ["string"])
+    longitude: String @rules(apply: ["string"])
+    method: BranchFilterMethod
+}
+
+# input TestingInput {
+#     name: String! @rules(apply: ["required", "string"])
+#     avatar: Upload
+# }
+
+# ################# add ####################
+input RegisterUserInput {
+    name: String @rules(apply: ["string"])
+    phone: String! @rules(apply: ["required", "min:10"])
+
+    role_id: String! @rules(apply: ["required", "numeric", "exists:roles,id"])
+
+    id_number: String
+    email: String @rules(apply: ["email"])
+    otp_hash: String
+}
+
+# input DiscountInput {
+#     code: String!
+# }
+
+input AddReviewInput {
+    driver_id: String! @rules(apply: ["required", "numeric", "exists:users,id"])
+    purchase_id: String!
+        @rules(apply: ["required", "numeric", "exists:purchases,id"])
+    pharmacy_id: String!
+        @rules(apply: ["required", "numeric", "exists:users,id"])
+    star_driver: String!
+        @rules(apply: ["required", "numeric", "min:1", "max:5"])
+    star_purchase: String @rules(apply: ["numeric", "min:1", "max:5"])
+
+    comment: String @rules(apply: ["string"])
+}
+
+# input AddFavoriteInput {
+#     # service_id: String! @rules(apply: ["required", "numeric"])
+# }
+
+# input AddFeedbackInput {
+#     email: String! @rules(apply: ["required", "email"])
+#     comment: String! @rules(apply: ["required"])
+# }
+
+# ################# update ####################
+
+input PurchaseInput {
+    cart_id: String! @rules(apply: ["numeric", "exists:carts,id"])
+    address_text: String
+    latitude: String
+    longitude: String
+    distance: String!
+    discount: String
+}
+
+input CartProductsInput {
+    pharmacy_product_id: String!
+        @rules(apply: ["numeric", "exists:pharmacy_products,id"])
+    pharmacy_product_variation_id: String!
+        @rules(apply: ["numeric", "exists:pharmacy_product_variations,id"])
+    quantity: String! @rules(apply: ["string"])
+}
+
+input DeleteCartProductsInput {
+    cart_pharmacy_product_id: String
+        @rules(apply: ["numeric", "exists:cart_pharmacy_products,id"])
+}
+
+input StoreUserAddressInput {
+    title: String! @rules(apply: ["string", "required"])
+    city_id: String @rules(apply: ["numeric", "exists:cities,id"])
+    address: String! @rules(apply: ["string", "required"])
+    latitude: String! @rules(apply: ["string", "required"])
+    longitude: String! @rules(apply: ["string", "required"])
+}
+
+input UpdateUserInput {
+    avatar: Upload
+    valid_id_picture: Upload
+    name: String @rules(apply: ["string"])
+    email: String @rules(apply: ["email"])
+    language: LangaugeMethod
+    latitude: String @rules(apply: ["string"])
+    longitude: String @rules(apply: ["string"])
+    bank_name: String @rules(apply: ["string"])
+    bank_account_no: String @rules(apply: ["string"])
+    id_number: String @rules(apply: ["string"])
+    city_id: String @rules(apply: ["numeric", "exists:cities,id"])
+    gender_id: String @rules(apply: ["numeric", "exists:genders,id"])
+    password: String @rules(apply: ["confirmed", "min:6"])
+    password_confirmation: String
+}
+
+input cancelPurchaseInput {
+    purchased_id: Int!
+}
+input orderCopmpleteInput {
+    purchase_id: String @rules(apply: ["numeric", "exists:purchases,id"])
+    proof_of_transaction: Upload
+}
+
+input rebookPurchaseInput {
+    purchased_id: Int!
+}
+
+input DeliveryFeeInput {
+    distance: String
+}

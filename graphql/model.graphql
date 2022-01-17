@@ -1,0 +1,364 @@
+type User {
+    id: ID!
+    phone: String!
+    name: String
+    email: String
+    language: String
+
+    role: Role! @belongsTo
+    city: City @belongsTo
+    gender: Gender @belongsTo
+    avatar: String
+
+    pharmacy_name: String
+    pharmacy_avatar: String
+
+    address: String
+    latitude: String
+    longitude: String
+
+    bio: String
+
+    id_number: String
+    valid_id_picture: String
+
+    registration_status: String
+    registration_note: String
+
+    bank_name: String
+    bank_account_num: String
+
+    bank_name: String
+    bank_account_num: String
+
+    agreement_verify: String
+    is_verified: Boolean
+    distance: String
+    product_categories: [ProductCategory] @hasMany(type: "paginator")
+
+    sent_reviews: [Review] @hasMany(type: "paginator")
+    files: [Files] @hasMany(type: "paginator")
+    received_reviews: [Review] @hasMany(type: "paginator")
+    default_user_address: UserAddress @belongsTo
+    user_addresses: [UserAddress] @hasMany(type: "paginator")
+
+    pharmacy_rating_average: Float @method(name: "getPharmacistReviewAttribute")
+    driver_rating_average: Float @method(name: "getDriverReviewAttribute")
+
+    pharmacy_rating_count: Float @method(name: "getPharmacistReviewCount")
+    driver_rating_count: Float @method(name: "getDriverReviewCount")
+    notificationsCount: Int @method(name: "getNotificationsCountAttribute")
+
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+type UserAddress {
+    id: ID!
+    user_id: String
+    title: String
+    address: String
+    latitude: String
+    longitude: String
+    city: City @belongsTo
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Product {
+    id: ID!
+    register_number: String
+    product_type: String
+    scientific_name: String
+
+    scientific_name_arabic: String
+    trade_name: String
+    trade_name_arabic: String
+    strength: String
+    strength_unit: String
+    files: [Files] @hasMany
+
+    size: String
+    size_unit: String
+
+    public_price: String
+    brand: String
+
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Cart {
+    id: ID!
+    user: User! @belongsTo
+    pharmacy: User! @belongsTo
+    cart_pharmacy_products: [CartPharmacyProduct] @hasMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+type CartPharmacyProduct {
+    id: ID!
+    pharmacy_product: PharmacyProduct! @belongsTo
+    pharmacy_product_variation: PharmacyProductVariation! @belongsTo
+    quantity: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+type PharmacyProduct {
+    id: ID!
+    user: User! @belongsTo
+    product: Product @belongsTo
+    product_category: ProductCategory @belongsTo
+
+    pharmacy_product_variations: [PharmacyProductVariation] @hasMany
+    files: [Files] @hasMany
+
+    description: String
+    display: String
+    deleted_at: DateTime
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type PharmacyProductVariation {
+    id: ID!
+
+    en: String
+
+    ar: String
+    sku: String
+    pharmacy_product: PharmacyProduct @belongsTo
+    files: [Files] @hasMany
+    quantity: String
+    price: String
+    promo_price: String
+    default_variation: Boolean
+    promo_date_start: String
+    promo_date_end: String
+    description: String
+    deleted_at: DateTime
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type PurchasePharmacyProduct {
+    id: ID!
+    user: User! @belongsTo
+    pharmacy: User! @belongsTo
+    pharmacy_product: PharmacyProduct @belongsTo
+    product_category: ProductCategory @belongsTo
+    pharmacy_product_variation: PharmacyProductVariation @belongsTo
+
+    pharmacy_product_variation_id: String
+    en: String
+    ar: String
+    purchase: Purchase @belongsTo
+    quantity: String
+    price: String
+    promo_price: String
+    total_amount: String
+    variation: String
+    description: String
+    display: String
+    deleted_at: DateTime
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Purchase {
+    id: ID!
+    user: User! @belongsTo
+    pharmacy: User! @belongsTo
+    driver: User @belongsTo
+    address_text: String
+    latitude: String
+    longitude: String
+    purchase_pharmacy_products: [PurchasePharmacyProduct] @hasMany
+
+    discount_id: Discount @belongsTo
+    discount_id: Discount @belongsTo
+
+    tax_rate: String
+    discount: String
+    driver_commission: String
+    admin_commission: String
+    timestamp_claim_driver_commission: DateTime
+    timestamp_claim_admin_commission: DateTime
+    tax_amount: String
+    delivery_fee: String
+    payment_status: String
+    invoice_token: String
+    tap_code_status: String
+    tap_id: String
+    payment_timestamp: String
+    payment_type: String
+
+    sub_total: String
+    total_amount: String
+    payment_id: String
+    status: String
+    status_notes: String
+    proof_of_transaction: String
+    deleted_at: DateTime
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Files {
+    id: ID!
+    file: String
+    extension: String
+    user_id: String
+    pharmacy_product_id: String
+    product_id: String
+}
+
+type Discount {
+    id: ID!
+    user: User! @belongsTo
+    title: String!
+    code: String!
+    expiration_date: String
+
+    rate: String
+    off: String
+    capacity: String
+    minimum_spend: String
+    type: String
+    get_used_discount_count: Float @method(name: "getUsedDiscountCount")
+    created_at: String
+    updated_at: String
+}
+
+type Inquiry {
+    name: String!
+    email: String!
+    message: String!
+    type: String!
+    user_id: String
+    user: User! @belongsTo
+    is_reply: String!
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Review {
+    user_id: String
+    driver_id: String
+    pharmacy_id: String
+
+    star_service: Int
+    star_staff: Int
+    star_employee: Int
+    comment_service: String
+    comment_employee: String
+    display: Boolean
+    comment: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Notification {
+    id: ID!
+    slug: String!
+    title: String!
+    message: String!
+    status: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type ProductCategory {
+    id: ID!
+    user_id: String!
+    en: String!
+    ar: String!
+}
+
+type Token {
+    id: ID
+    api_token: String
+    firebase_token: String
+    user_id: String
+}
+
+type Ad {
+    id: ID!
+    en: String
+    ar: String
+    description: String
+    image: String
+    display: Boolean
+}
+
+type Question {
+    id: ID!
+    question: String
+    answer: String
+}
+
+type Role {
+    id: ID!
+    en: String!
+    ar: String!
+}
+
+type Area {
+    id: ID!
+    en: String!
+    ar: String!
+    city: City! @belongsTo
+}
+
+type Gender {
+    id: ID!
+    en: String!
+    ar: String!
+}
+
+type City {
+    id: ID!
+    en: String!
+    en_1: String
+    ar: String!
+    ar_1: String
+    ar_2: String
+    ar_3: String!
+}
+
+type Setting {
+    about_us: String
+    terms_and_conditions: String
+    contact_us: String
+    contact_us: String
+    general_cancellation_policy_en: String
+    about_us_ar: String
+    terms_and_conditions_ar: String
+    contact_us_ar: String
+    general_cancellation_policy_ar: String
+    tax_rate: String
+    app_commission: String
+    admin_commission: String
+    driver_commission: String
+
+    delivery_fee_less_than_5_km: String
+    delivery_fee_5_to_10_km: String
+    delivery_fee_more_than_10_km: String
+    cancellation_time_limit: String
+    account_name: String
+    account_no: String
+    bank_name: String
+    facebook: String
+    twitter: String
+    instagram: String
+}
+
+type Question {
+    question: String!
+    answer: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type FireBaseCustomToken {
+    token: String
+}

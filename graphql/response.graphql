@@ -1,0 +1,58 @@
+# Responses
+type UserWithTokenResponse {
+    user: User!
+    token: String!
+    code: String
+    message: String
+}
+type CodeWithTokenResponse {
+    code: String
+    token: String
+    status: Boolean
+}
+type StatusMessageResponse {
+    status: Boolean
+    id: ID
+    message: String
+}
+
+type PurchaseMessageResponse {
+    status: Boolean
+    id: ID
+    referenceId: String
+    message: String
+}
+
+type getChargeDetailsResponse {
+    tap_code_status: String
+    payment_timestamp: String
+    payment_status: String
+    payment_type: String
+}
+
+type CalculateDriverReportResponse {
+    status: Boolean
+    total: String
+    month: String
+    method: String
+    year: String
+    count: String
+    date_start: String
+    date_end: String
+    # total_bravo_commission: String
+}
+type CalculateReviewResponse {
+    total: Int!
+    average: Float!
+    count: CountStar!
+}
+type CountStar {
+    one: Int!
+    two: Int!
+    three: Int!
+    four: Int!
+}
+
+type DeliveryFeeResponse {
+    delivery_fee: String!
+}

@@ -1,0 +1,46 @@
+enum BranchFilterMethod {
+    nearby
+    trending
+    latest
+}
+enum LangaugeMethod {
+    en
+    ar
+}
+enum BookingStatuses {
+    pending
+    received
+    confirmed
+    complete
+    rated
+    cancel
+}
+
+enum InquiryType {
+    web
+    mobile
+}
+
+enum PurchaseStatuses {
+    order_received
+    preparing_order
+    in_transit
+    order_complete
+    cancelled
+    payment
+    driver_accept
+    driver_arrived
+    rated
+}
+
+enum RiderStatuses {
+    in_transit
+    driver_accept
+    driver_arrived
+}
+
+enum RiderPaymentRecords {
+    claimed
+    unclaimed
+    all
+}

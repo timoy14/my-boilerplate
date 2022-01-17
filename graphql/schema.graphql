@@ -1,0 +1,282 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-01-01 13:00:00`."
+scalar DateTime
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+scalar Upload
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
+
+type Mutation {
+    registerUser(input: RegisterUserInput @spread): UserWithTokenResponse!
+        @field(resolver: "AuthMutator@registerUser")
+    loginViaPhone(input: LoginViaPhoneInput @spread): UserWithTokenResponse!
+        @field(resolver: "AuthMutator@loginViaPhone")
+
+    loginViaPhoneOnly(
+        input: LoginViaPhoneOnlyInput @spread
+    ): UserWithTokenResponse! @field(resolver: "AuthMutator@loginViaPhoneOnly")
+    inquiry(input: InquiryInput @spread): StatusMessageResponse!
+        @field(resolver: "InquiryMutator@storeInquiery")
+
+    sendOtp(
+        phone: String!
+        role_id: String!
+        otp_hash: String
+    ): CodeWithTokenResponse! @field(resolver: "AuthMutator@sendOtp")
+    forgotViaPhone(input: ForgotViaPhoneInput @spread): CodeWithTokenResponse!
+        @field(resolver: "AuthMutator@forgotViaPhone")
+
+    # addFeedback(input: AddFeedbackInput @spread): StatusMessageResponse!
+    #     @field(resolver: "FeedbackMutator")
+}
+
+extend type Mutation @guard(checks: ["auth:api"]) {
+    updateUser(input: UpdateUserInput @spread): User!
+        @field(resolver: "AuthMutator@updateUser")
+
+    verifyUser(otp: Int!): StatusMessageResponse!
+        @field(resolver: "AuthMutator@verify")
+
+    changePassword(input: ChangePasswordInput @spread): StatusMessageResponse!
+        @field(resolver: "AuthMutator@changePassword")
+    logoutUser: StatusMessageResponse!
+        @field(resolver: "AuthMutator@logoutUser")
+
+    # addExpoToken(input: AddExpoTokenInput @spread): StatusMessageResponse!
+    #     @field(resolver: "ExpoTokenMutator@addExpoToken")
+    # removeExpoToken: StatusMessageResponse!
+    #     @field(resolver: "ExpoTokenMutator@removeExpoToken")
+
+    AddReview(input: AddReviewInput @spread): StatusMessageResponse!
+        @field(resolver: "ReviewMutator@review")
+
+    addPharmacyProductToCart(
+        input: CartProductsInput @spread
+    ): StatusMessageResponse! @field(resolver: "CartMutator@addCart")
+
+    findDiscountCode(code: String): Discount
+        @field(resolver: "BookingMutator@findDiscountCode")
+
+    addPurchase(input: PurchaseInput @spread): PurchaseMessageResponse!
+        @field(resolver: "BookingMutator@addPurchase")
+    cancelPurchase(
+        input: cancelPurchaseInput @spread
+    ): PurchaseMessageResponse! @field(resolver: "BookingMutator@cancelBooking")
+
+    driverAcceptDelivery(purchase_id: Int!): PurchaseMessageResponse!
+        @field(resolver: "BookingMutator@driverAcceptDelivery")
+    driverArrivedAtStore(purchase_id: Int!): PurchaseMessageResponse!
+        @field(resolver: "BookingMutator@driverArrivedAtStore")
+    driverInTransit(purchase_id: Int!): PurchaseMessageResponse!
+        @field(resolver: "BookingMutator@driverInTransit")
+    driverArrived(purchase_id: Int!): PurchaseMessageResponse!
+        @field(resolver: "BookingMutator@driverArrived")
+
+    orderComplete(input: orderCopmpleteInput @spread): PurchaseMessageResponse!
+        @field(resolver: "BookingMutator@orderComplete")
+    customerOrderReceived(purchase_id: Int!): PurchaseMessageResponse!
+        @field(resolver: "BookingMutator@customerOrderReceived")
+
+    # rebookPurchase(
+    #     input: rebookPurchaseInput @spread
+    # ): PurchaseMessageResponse!
+    #     @field(resolver: "BookingMutator@rebookPurchased")
+
+    updatePharmacyProductToCart(
+        input: CartProductsInput @spread
+    ): StatusMessageResponse! @field(resolver: "CartMutator@updateCart")
+
+    deletePharmacyProductToCart(
+        input: DeleteCartProductsInput @spread
+    ): StatusMessageResponse! @field(resolver: "CartMutator@deleteCart")
+
+    storeUserAddress(
+        input: StoreUserAddressInput @spread
+    ): StatusMessageResponse! @field(resolver: "AuthMutator@storeUserAddress")
+
+    deleteUserAddress(id: ID!): UserAddress
+        @delete(model: "App\\Model\\UserAddress")
+}
+
+type Query {
+    users: [User!]! @paginate(defaultCount: 10)
+    viewPurchase(id: ID! @eq): Purchase @find(model: "App\\Model\\Purchase")
+    viewUser(id: ID! @eq): User @find(model: "App\\User")
+    allUsers(
+        role_id: Int @where(key: "role_id")
+        city_id: Int @where(key: "city_id")
+        gender_id: Int @where(key: "gender_id")
+        orderBy: [OrderByInput!] @orderBy
+    ): [User!] @paginate(type: "paginator", model: "App\\User")
+
+    allRoles: [Role!]! @all(model: "App\\Model\\Role")
+
+    allGenders: [Gender!]! @all(model: "App\\Model\\Gender")
+    allCities: [City!]! @all(model: "App\\Model\\City")
+    getCitiesWithPharmacy(orderBy: [City!] @orderBy): [City!]
+        @paginate(
+            type: "paginator"
+            builder: "App\\GraphQL\\Queries\\Filter@getCitiesWithPharmacy"
+        )
+    allAreas(city_id: Int @where(key: "city_id")): [Area!]
+        @all(model: "App\\Model\\Area")
+    allSettings: Setting! @first(model: "App\\Model\\Setting")
+    allQuestions: [Question!]! @all(model: "App\\Model\\Question")
+    Advertisements(display: Boolean @where(key: "display")): [Ad!]!
+        @all(model: "App\\Model\\Ad")
+
+    productCategoryByUSer(
+        user_id: Int @where(key: "user_id")
+    ): [ProductCategory!] @all(model: "App\\Model\\ProductCategory")
+
+    getNearbyPharmacy(
+        latitude: String @rules(apply: ["string"])
+        longitude: String @rules(apply: ["string"])
+        search: String @rules(apply: ["string"])
+        city_id: String @rules(apply: ["string", "exists:cities,id"])
+        orderBy: [User!] @orderBy
+    ): [User!]
+        @paginate(
+            type: "paginator"
+            builder: "App\\GraphQL\\Queries\\Filter@getNearbyPharmacy"
+        )
+
+    searchPharmacy(
+        search: String @rules(apply: ["string"])
+        latitude: String @rules(apply: ["string"])
+        longitude: String @rules(apply: ["string"])
+        orderBy: [User!] @orderBy
+        city_id: String @rules(apply: ["string", "exists:cities,id"])
+    ): [User!]
+        @paginate(
+            type: "paginator"
+            builder: "App\\GraphQL\\Queries\\Filter@searchPharmacy"
+        )
+
+    getNearbyAvailableOrderToFetch(
+        latitude: String @rules(apply: ["string"])
+        longitude: String @rules(apply: ["string"])
+        orderBy: [Purchase!] @orderBy
+    ): [Purchase!]
+        @paginate(
+            type: "paginator"
+            builder: "App\\GraphQL\\Queries\\Filter@getNearbyAvailableOrderToFetch"
+        )
+
+    getDeliveryFee(input: DeliveryFeeInput @spread): DeliveryFeeResponse!
+        @field(resolver: "DeliveryFeeCalculator")
+
+    searchProductByCategory(
+        latitude: String @rules(apply: ["string"])
+        longitude: String @rules(apply: ["string"])
+        product_category_id: String
+            @rules(apply: ["string", "exists:product_categories,id"])
+        search: String
+        orderBy: [PharmacyProduct!] @orderBy
+    ): [PharmacyProduct!]
+        @paginate(
+            type: "paginator"
+            builder: "App\\GraphQL\\Queries\\Filter@searchProductByCategory"
+        )
+    searchProduct(
+        pharmacy_id: String @rules(apply: ["string", "exists:users,id"])
+        latitude: String @rules(apply: ["string"])
+        longitude: String @rules(apply: ["string"])
+        search: String
+        orderBy: [PharmacyProduct!] @orderBy
+    ): [PharmacyProduct!]
+        @paginate(
+            type: "paginator"
+            builder: "App\\GraphQL\\Queries\\Filter@searchProduct"
+        )
+
+    getRiderDeliveries(
+        method: RiderPaymentRecords!
+        date_from: String
+        date_to: String
+        orderBy: [Purchase!] @orderBy
+    ): [Purchase]!
+        @paginate(
+            type: "paginator"
+            builder: "App\\GraphQL\\Queries\\Filter@riderDeliveries"
+        )
+}
+# myNotifications(
+#     user_id: Int @where(key: "user_id")
+#     orderBy: [OrderByInput!] @orderBy
+# ): [Notification!]
+#     @paginate(type: "paginator", model: "App\\Model\\Notification")
+extend type Query @guard(checks: ["auth:api"]) {
+    me: User! @auth
+    myCart: MyCart! @auth
+    myAddress: MyAddress! @auth
+    myPurchase: MyPurchase! @auth
+    myDelivery: MyDelivery! @auth
+    myInquiry: MyInquiry! @auth
+
+    getChargeDetails(purchase_id: String): getChargeDetailsResponse
+        @field(resolver: "App\\GraphQL\\Queries\\PaymentQuery@details")
+
+    getFireBaseCustomToken: FireBaseCustomToken!
+        @field(resolver: "App\\GraphQL\\Queries\\CreateFireBaseCstomToken")
+
+    calculateDriverReportResponse(
+        method: RiderPaymentRecords!
+        date_from: String
+        date_to: String
+    ): CalculateDriverReportResponse!
+        @field(
+            resolver: "App\\GraphQL\\Queries\\Filter@calculateDriverReportResponse"
+        )
+
+    calculateDriverReportbyMonths(
+        month_count: String
+    ): [CalculateDriverReportResponse!]
+        @field(
+            resolver: "App\\GraphQL\\Queries\\Filter@CalculateDriverReportbyMonths"
+        )
+    CalculateDriverReportbyMonth(
+        month: String!
+        year: String!
+    ): CalculateDriverReportResponse!
+        @field(
+            resolver: "App\\GraphQL\\Queries\\Filter@CalculateDriverReportbyMonth"
+        )
+
+    # userReviews: UserReview! @auth
+    # checkConversationID(receiver_id: ID! @eq): String!
+}
+
+type MyPurchase @model(class: "App\\User") {
+    purchases(
+        status: [String] @in(key: "status")
+        orderBy: [Purchase!] @orderBy
+    ): [Purchase] @hasMany(type: "paginator")
+}
+
+type MyDelivery @model(class: "App\\User") {
+    deliveries(
+        status: [String] @in(key: "status")
+        orderBy: [Purchase!] @orderBy
+    ): [Purchase] @hasMany(type: "paginator")
+}
+
+type MyCart @model(class: "App\\User") {
+    carts(orderBy: [Cart!] @orderBy): [Cart] @hasMany(type: "paginator")
+}
+
+type MyAddress @model(class: "App\\User") {
+    my_addresses(orderBy: [UserAddress!] @orderBy): [UserAddress]
+        @hasMany(type: "paginator")
+}
+
+type MyInquiry @model(class: "App\\User") {
+    inquiries: [Inquiry] @hasMany(type: "paginator")
+}
+
+#import model.graphql
+#import input.graphql
+#import response.graphql
+#import enum.graphql
