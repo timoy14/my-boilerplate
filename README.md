@@ -1,4 +1,4 @@
-# Alrapeh App (Dashboard + Api)
+#  (Dashboard + Api)
 
 ## Features
 
@@ -10,7 +10,7 @@
 ## Installation
 
 -   `Open Terminal`
--   `git clonehttps://github.com/Abdullah9/alrapeh_Api`
+-   `git clone git@github.com:timoy14/my-boilerplate.git`
 -   `composer install`
 -   `npm install && npm run dev`
 -   `php artisan migrate && php artisan db:seed`
@@ -25,20 +25,17 @@
 npm run watch
 
 # refresh db
-php artisan migrate:refresh && php artisan db:seedl
+php artisan migrate:refresh && php artisan db:seed
 ```
 
 ## Author
 
 ```bash
-roneil sullano
-roneil.work95@gmail.com
-http://wit-sa.com/
+Mark Anthony Garado
+garadotimoy@gmail.com
 ```
-# FindDoc_dashboard-
-# FindDoc_dashboard-
 
 Admin
-0555606611
+9999999999
 adminadmin
 
